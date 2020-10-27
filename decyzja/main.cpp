@@ -137,8 +137,7 @@ bool wczytajDrzewo(std::string nazwaPliku)
     {
         return false;
     }
-    // std::cout<<"---------------"<<std::endl;
-
+    
     // wyswietlDrzewo(korzen);
     return true;
 }
