@@ -6,11 +6,11 @@
 #include "Grupa.h"
 
 
-Wezel * korzen;
+Wezel * korzen = NULL;
 
 /** doxygen
 @author: imie nazwisko
-
+@param: Wezel* wskaznik na Wezel
 */
 void wyswietlDrzewo(Wezel * ptr)
 {
