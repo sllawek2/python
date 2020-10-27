@@ -1,31 +1,32 @@
 #include "Wezel.h"
 
-Wezel * Wezel::znajdzWezel(const std::string & etykieta)
+Wezel * Wezel::nastepny(std::string wartosc, std::string & etykieta)
 {
-    Wezel * tmp = this;
-
-    // if (tmp->wejscie != etykieta)
-    // {
-    //     tmp
-    // }
-
-
-
-
-
-    if (this->wejscie == etykieta)
+    if(war.oper == "<")
     {
-        return this;
+        if (atof(wartosc.c_str()) < war.wartosc)
+        {
+            etykieta = wyjscieNie;
+            return this->nie;
+        }
+        else
+        {
+            
+            etykieta = wyjscieTak;
+            return this->tak;
+        }
     }
     else
     {
-        Wezel * tmp = nullptr;
-        if(this->nie != nullptr)
+        if (atof(wartosc.c_str()) > war.wartosc)
         {
-            tmp = this->nie->znajdzWezel(etykieta);
+            etykieta = wyjscieNie;
+            return this->nie;
         }
-        if (tmp != nullptr && )
+        else
+        {
+            etykieta = wyjscieTak;
+            return this->tak;
+        }
     }
-    return 
 }
-

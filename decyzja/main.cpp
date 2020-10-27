@@ -14,7 +14,6 @@ Wezel * korzen = NULL;
 */
 void wyswietlDrzewo(Wezel * ptr)
 {
-
     if(ptr != NULL)
     {
         std::cout << ptr->wyjscieNie<< " - "<< ptr->wyjscieTak <<std::endl;
@@ -58,7 +57,7 @@ Wezel * dodajWezel(Wezel * ptr, const std::string & tekst)
     }
     else
     {
-        // etykiety nie zgadzały się, przejdź dalej po drzewie
+        // etykiety nie zgadzaly sie, przejdź dalej po drzewie
         Wezel * tmp = NULL;
         if(ptr->nie != NULL)
         {
@@ -210,24 +209,22 @@ bool zapiszWynik(std::vector<Grupa> wynik, std::string nazwaPliku)
     }
     else
     {
-        std::cout<<"Nie udało się utworzyć pliku wyjściowego"<<std::endl;
+        std::cout<<"Nie udalo sie utworzyc pliku wyjsciowego: "<<nazwaPliku<<std::endl;
         return false;
     }
     
     return true;
 }
 
-
-int main(const int argc, char * argv[])
+/** Funkcja sprawdzajaca parametry
+ * 
+ */
+bool wczytajParametry(const int argc, const char * argv[], std::string & wejsciowy, std::string & drzewa, std::string & wyjsciowy)
 {
-    // wczytanie parametrów
-    std::string wejsciowy;
-    std::string drzewa;
-    std::string wyjsciowy;
     if (argc != 7)
     {
-        std::cout<<"Nieprawidłowa ilość parametrów. Przykład użycia:\n"<<argv[0]<<" -i plik_wejsciowy -t plik_drzewa -o plik_wyjsciowy"<<std::endl;
-        return 1;
+        std::cout<<"Nieprawidlowa ilosc parametrow."<<std::endl;
+        return false;
     }
     else
     {
@@ -260,38 +257,55 @@ int main(const int argc, char * argv[])
             }
         } 
     }
-
-    // sprawdzenie wczytanych nazw plików
     if (wejsciowy.empty() || drzewa.empty() || wyjsciowy.empty())
     {
-        std::cout<<"Nieprawidłowe parametry. Przykład użycia:\n"<<argv[0]<<" -i plik_wejsciowy -t plik_drzewa -o plik_wyjsciowy"<<std::endl;
-        return 1;
+        std::cout<<"Nieprawidlowe parametry"<<std::endl;
+        return false;
     }
+    return true;
+}
 
-    // wczytanie danych z pliku do struktury drzewa
-    if (wczytajDrzewo(drzewa) == false)
+int main(const int argc, const char * argv[])
+{
+    // nazwy plikow
+    std::string plikWejsciowy;
+    std::string plikDrzewa;
+    std::string plikWyjsciowy;
+  
+    // sprawdzenie wczytanych nazw plikow
+    if (wczytajParametry(argc, argv, plikWejsciowy, plikDrzewa, plikWyjsciowy) == false)
     {
-        std::cout<<"Nie udało się wczytac drzewa z pliku: "<<drzewa<<std::endl;
+        std::cout<<"Przyklad uzycia:\n"<<argv[0]<<" -i plik_wejsciowy -t plik_drzewa -o plik_wyjsciowy"<<std::endl;
         return 1;
     }
 
+    // wczytanie drzewa z pliku do struktury drzewa
+    if (wczytajDrzewo(plikDrzewa) == false)
+    {
+        std::cout<<"Nie udalo sie wczytac drzewa z pliku: "<<plikDrzewa<<std::endl;
+        return 1;
+    }
+
+    // wczytanie danych z pliku
     std::vector<std::string> dane;
-    if (wczytajDane(dane, wejsciowy) == false)
+    if (wczytajDane(dane, plikWejsciowy) == false)
     {
-        std::cout<<"Nie udało się wczytać danych z pliku: "<<wejsciowy<<std::endl;
+        std::cout<<"Nie udalo sie wczytac danych z pliku: "<<plikWejsciowy<<std::endl;
     }
 
+    // przyporzadkowanie wartosci do odpowiednich etykiet
     std::vector<Grupa> wynik;
-
     for(std::vector<std::string>::iterator iter = dane.begin(); iter != dane.end(); ++iter)
     {
         dodajDoGrupy(wynik, *iter);
     }
 
-    std::cout<<"--------WYNIK---------"<<std::endl;
+    // zapisanie wyniku ze struktury do pliku
+    if (zapiszWynik(wynik, plikWyjsciowy) == false)
+    {
+        return 1;
+    }
 
-    zapiszWynik(wynik, wyjsciowy);
-
-    delete korzen;
+    // delete korzen;
     return 0;
 }
