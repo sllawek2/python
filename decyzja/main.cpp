@@ -6,7 +6,6 @@
 #include "Grupa.h"
 
 
-Wezel * korzen = NULL;
 
 /** doxygen
 @author: imie nazwisko
@@ -22,25 +21,7 @@ void wyswietlDrzewo(Wezel * ptr)
     }
 }
 
-std::string znajdzEtykiete(Wezel * ptr,std::string dane)
-{
-    while (dane.empty() == false)
-    {
-        std::size_t pos = dane.find(' ');
-        std::string wartosc = dane.substr(0, pos);
-        std::string etykieta;
-        Wezel * nastepny = ptr->nastepny(wartosc, etykieta);
-        if (nastepny == NULL)
-        {
-            return etykieta;
-        }
-        else
-        {
-            ptr = nastepny;
-        }
-        dane = dane.substr(pos+1);
-    }
-}
+
 
 Wezel * dodajWezel(Wezel * ptr, const std::string & tekst)
 {
@@ -80,7 +61,7 @@ Wezel * dodajWezel(Wezel * ptr, const std::string & tekst)
     return NULL;
 }
 
-bool wczytajDrzewo(std::string nazwaPliku)
+bool wczytajDrzewo(Wezel * & korzen, std::string nazwaPliku)
 {
     std::ifstream plik(nazwaPliku.c_str(), std::ios::in);
     std::string linia;
@@ -128,8 +109,6 @@ bool wczytajDrzewo(std::string nazwaPliku)
             linia = linia.substr(pos+1);
             pos = linia.find(' ');
             ptr->wyjscieTak = linia.substr(0, pos);
-
-            // std::cout << ptr->wyjscieNie<< " - "<< ptr->wyjscieTak <<std::endl;
         }
     }
     else
@@ -141,9 +120,9 @@ bool wczytajDrzewo(std::string nazwaPliku)
     return true;
 }
 
-void dodajDoGrupy(std::vector<Grupa> &wynik, std::string dane)
+void dodajDoGrupy(std::vector<Grupa> &wynik, std::string dane, Wezel * korzen)
 {
-   std::string etykieta = znajdzEtykiete(korzen, dane);
+   std::string etykieta = korzen->znajdzEtykiete(dane);
    bool juzIstnieje = false;
    for(std::vector<Grupa>::iterator iter = wynik.begin(); iter != wynik.end(); iter++)
    {
@@ -279,8 +258,10 @@ int main(const int argc, const char * argv[])
         return 1;
     }
 
+
     // wczytanie drzewa z pliku do struktury drzewa
-    if (wczytajDrzewo(plikDrzewa) == false)
+    Wezel * korzen = NULL;
+    if (wczytajDrzewo(korzen, plikDrzewa) == false)
     {
         std::cout<<"Nie udalo sie wczytac drzewa z pliku: "<<plikDrzewa<<std::endl;
         return 1;
@@ -297,7 +278,7 @@ int main(const int argc, const char * argv[])
     std::vector<Grupa> wynik;
     for(std::vector<std::string>::iterator iter = dane.begin(); iter != dane.end(); ++iter)
     {
-        dodajDoGrupy(wynik, *iter);
+        dodajDoGrupy(wynik, *iter, korzen);
     }
 
     // zapisanie wyniku ze struktury do pliku
@@ -306,6 +287,6 @@ int main(const int argc, const char * argv[])
         return 1;
     }
 
-    // delete korzen;
+    delete korzen;
     return 0;
 }
