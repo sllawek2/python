@@ -4,17 +4,17 @@
 
 class Wezel
 {
-    std::string wejscie;
-    Warunek war;
-    std::string wyjscieNie;
-    std::string wyjscieTak;
-    Wezel * nie;
-    Wezel * tak;
 public:
     std::string znajdzEtykiete(std::string dane);
-    Wezel * dodaj(const std::string & tekst);
     bool wczytajDrzewo(std::string nazwaPliku);
 
+    Wezel (std::string etykieta)
+    {
+        this->etykieta = etykieta;
+        this->nie = NULL;
+        this->tak = NULL;
+    }
+    
     ~Wezel()
     {
         delete nie;
@@ -22,11 +22,15 @@ public:
     }
 
 private:
-  /** abdc
+  /** 
    * @author imie b
-   * @return wskaźnik obiekt Wezeł
+   * @return bool
    * @param std::string wart
    * */
-    Wezel * nastepny(std::string wartosc, std::string & etykieta);
-    Wezel * dodajWezel(Wezel * ptr, const std::string & tekst);
+    bool dodajWezel(std::string tekst);
+
+    std::string etykieta;
+    Warunek war;
+    Wezel * nie;
+    Wezel * tak;
 };

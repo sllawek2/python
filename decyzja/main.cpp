@@ -25,7 +25,6 @@ void dodajDoGrupy(std::vector<Grupa> &wynik, std::string dane, Wezel * korzen)
        tmp.dane.push_back(dane);
        wynik.push_back(tmp);
    }
-
 }
 
 bool wczytajDane(std::vector<std::string> & dane, std::string nazwaPliku)
@@ -132,6 +131,7 @@ bool wczytajParametry(const int argc, const char * argv[], std::string & wejscio
 
 int main(const int argc, const char * argv[])
 {
+
     // nazwy plikow
     std::string plikWejsciowy;
     std::string plikDrzewa;
@@ -145,11 +145,11 @@ int main(const int argc, const char * argv[])
     }
 
     // wczytanie drzewa z pliku do struktury drzewa
-    Wezel * korzen = new Wezel();
-
+    Wezel * korzen = new Wezel("0");
     if (korzen->wczytajDrzewo(plikDrzewa) == false)
     {
         std::cout<<"Nie udalo sie wczytac drzewa z pliku: "<<plikDrzewa<<std::endl;
+        delete korzen;
         return 1;
     }
 
@@ -170,6 +170,7 @@ int main(const int argc, const char * argv[])
     // zapisanie wyniku ze struktury do pliku
     if (zapiszWynik(wynik, plikWyjsciowy) == false)
     {
+        delete korzen;
         return 1;
     }
 

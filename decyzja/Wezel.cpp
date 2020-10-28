@@ -9,140 +9,89 @@ std::string Wezel::znajdzEtykiete(std::string dane)
         std::size_t pos = dane.find(' ');
         std::string wartosc = dane.substr(0, pos);
         std::string etykieta;
-        Wezel * nastepny = ptr->nastepny(wartosc, etykieta);
-        if (nastepny == NULL)
+        if ( ptr->nie == NULL || ptr->tak == NULL)
         {
-            return etykieta;
+            return ptr->etykieta;
+        }
+        else if(ptr->war.oper == "<")
+        {
+            if (atof(wartosc.c_str()) < ptr->war.wartosc)
+            {
+                ptr = ptr->nie;
+            }
+            else
+            {
+                ptr = ptr->tak;
+            }
         }
         else
         {
-            ptr = nastepny;
-        }
+            if (atof(wartosc.c_str()) > ptr->war.wartosc)
+            {
+                ptr = ptr->nie;
+            }
+            else
+            {
+                ptr = ptr->tak;
+            }
+        }        
         dane = dane.substr(pos+1);
     }
 }
 
-Wezel * Wezel::nastepny(std::string wartosc, std::string & etykieta)
+bool Wezel::dodajWezel(std::string linia)
 {
-    if(war.oper == "<")
+    bool ret = false;
+    std::size_t pos = linia.find(' ');
+    std::string indeks = linia.substr(0, pos);
+    if (this->etykieta == indeks)
     {
-        if (atof(wartosc.c_str()) < war.wartosc)
-        {
-            etykieta = wyjscieNie;
-            return this->nie;
-        }
-        else
-        {
-            
-            etykieta = wyjscieTak;
-            return this->tak;
-        }
-    }
-    else
-    {
-        if (atof(wartosc.c_str()) > war.wartosc)
-        {
-            etykieta = wyjscieNie;
-            return this->nie;
-        }
-        else
-        {
-            etykieta = wyjscieTak;
-            return this->tak;
-        }
-    }
-}
+        linia = linia.substr(pos+1); 
+        pos = linia.find(' ');
+        this->war.atrybut = linia.substr(0, pos);
 
-Wezel * Wezel::dodaj(const std::string & tekst)
-{
-    return dodajWezel(this, tekst);
-}
+        linia = linia.substr(pos+1);
+        pos = linia.find(' ');
+        this->war.oper = linia.substr(0, pos);
 
-Wezel * Wezel::dodajWezel(Wezel * ptr, const std::string & tekst)
-{
-    // sprawdź etykiety
-    if (ptr->wyjscieNie == tekst)
-    {
-        ptr->nie = new Wezel();
-        return ptr->nie;
+        linia = linia.substr(pos+1);
+        pos = linia.find(' ');
+        this->war.wartosc = atof(linia.substr(0, pos).c_str());
+
+        linia = linia.substr(pos+1);
+        pos = linia.find(' ');
+        this->nie = new Wezel(linia.substr(0, pos));
+
+        linia = linia.substr(pos+1);
+        pos = linia.find(' ');
+        this->tak = new Wezel(linia.substr(0, pos));
+        ret = true;
     }
-    else if (ptr->wyjscieTak == tekst)
+    if (ret == false && this->tak != NULL)
     {
-        ptr->tak = new Wezel();
-        return ptr->tak;
+        ret = this->tak->dodajWezel(linia);
     }
-    else
+    if (ret == false && this->nie != NULL)
     {
-        // etykiety nie zgadzaly sie, przejdź dalej po drzewie
-        Wezel * tmp = NULL;
-        if(ptr->nie != NULL)
-        {
-            tmp = dodajWezel(ptr->nie, tekst);
-            if(tmp != NULL)
-            {
-                return tmp;
-            }
-        }
-        if(ptr->tak != NULL)
-        {
-            tmp = dodajWezel(ptr->tak, tekst);
-            if(tmp != NULL)
-            {
-                return tmp;
-            }
-        }
+        ret = this->nie->dodajWezel(linia);        
     }
-    // koniec drzewa
-    return NULL;
+    return ret;
 }
 
 bool Wezel::wczytajDrzewo(std::string nazwaPliku)
 {
     std::ifstream plik(nazwaPliku.c_str(), std::ios::in);
     std::string linia;
-    
-    Wezel * ptr = this;
-    bool pierwszyWezel = true;
+
     if(plik.good())
     {
         while(std::getline(plik, linia))
         {
-            std::size_t pos = linia.find(' ');
-            std::string indeks = linia.substr(0, pos);
-
-            if (pierwszyWezel == true)
+            if( this->dodajWezel(linia) == false)
             {
-                pierwszyWezel = false;
+                std::cout<<"Problem z plikiem drzewa: nie ma takiego indeksu wejscia"<<std::endl;
+                return false;
             }
-            else
-            {
-                ptr = this->dodaj(indeks);
-                if (ptr == NULL)
-                {
-                    std::cout<<"Problem z plikiem drzewa: nie ma takiego indeksu wejscia"<<std::endl;
-                    return false;
-                }
-            }
-
-            linia = linia.substr(pos+1);
-            pos = linia.find(' ');
-            ptr->war.atrybut = linia.substr(0, pos);
-
-            linia = linia.substr(pos+1);
-            pos = linia.find(' ');
-            ptr->war.oper = linia.substr(0, pos);
-
-            linia = linia.substr(pos+1);
-            pos = linia.find(' ');
-            ptr->war.wartosc = atof(linia.substr(0, pos).c_str());
-
-            linia = linia.substr(pos+1);
-            pos = linia.find(' ');
-            ptr->wyjscieNie = linia.substr(0, pos);
-
-            linia = linia.substr(pos+1);
-            pos = linia.find(' ');
-            ptr->wyjscieTak = linia.substr(0, pos);
         }
     }
     else
