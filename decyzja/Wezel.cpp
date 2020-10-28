@@ -1,4 +1,5 @@
 #include "Wezel.h"
+#include <fstream>
 
 std::string Wezel::znajdzEtykiete(std::string dane)
 {
@@ -52,6 +53,11 @@ Wezel * Wezel::nastepny(std::string wartosc, std::string & etykieta)
     }
 }
 
+Wezel * Wezel::dodaj(const std::string & tekst)
+{
+    return dodajWezel(this, tekst);
+}
+
 Wezel * Wezel::dodajWezel(Wezel * ptr, const std::string & tekst)
 {
     // sprawdź etykiety
@@ -88,4 +94,60 @@ Wezel * Wezel::dodajWezel(Wezel * ptr, const std::string & tekst)
     }
     // koniec drzewa
     return NULL;
+}
+
+bool Wezel::wczytajDrzewo(std::string nazwaPliku)
+{
+    std::ifstream plik(nazwaPliku.c_str(), std::ios::in);
+    std::string linia;
+    
+    Wezel * ptr = this;
+    bool pierwszyWezel = true;
+    if(plik.good())
+    {
+        while(std::getline(plik, linia))
+        {
+            std::size_t pos = linia.find(' ');
+            std::string indeks = linia.substr(0, pos);
+
+            if (pierwszyWezel == true)
+            {
+                pierwszyWezel = false;
+            }
+            else
+            {
+                ptr = this->dodaj(indeks);
+                if (ptr == NULL)
+                {
+                    std::cout<<"Problem z plikiem drzewa: nie ma takiego indeksu wejscia"<<std::endl;
+                    return false;
+                }
+            }
+
+            linia = linia.substr(pos+1);
+            pos = linia.find(' ');
+            ptr->war.atrybut = linia.substr(0, pos);
+
+            linia = linia.substr(pos+1);
+            pos = linia.find(' ');
+            ptr->war.oper = linia.substr(0, pos);
+
+            linia = linia.substr(pos+1);
+            pos = linia.find(' ');
+            ptr->war.wartosc = atof(linia.substr(0, pos).c_str());
+
+            linia = linia.substr(pos+1);
+            pos = linia.find(' ');
+            ptr->wyjscieNie = linia.substr(0, pos);
+
+            linia = linia.substr(pos+1);
+            pos = linia.find(' ');
+            ptr->wyjscieTak = linia.substr(0, pos);
+        }
+    }
+    else
+    {
+        return false;
+    }
+    return true;
 }

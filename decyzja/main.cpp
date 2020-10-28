@@ -6,120 +6,6 @@
 #include "Grupa.h"
 
 
-
-/** doxygen
-@author: imie nazwisko
-@param: Wezel* wskaznik na Wezel
-*/
-void wyswietlDrzewo(Wezel * ptr)
-{
-    if(ptr != NULL)
-    {
-        std::cout << ptr->wyjscieNie<< " - "<< ptr->wyjscieTak <<std::endl;
-        wyswietlDrzewo(ptr->nie);
-        wyswietlDrzewo(ptr->tak);
-    }
-}
-
-
-
-Wezel * dodajWezel(Wezel * ptr, const std::string & tekst)
-{
-    // sprawdź etykiety
-    if (ptr->wyjscieNie == tekst)
-    {
-        ptr->nie = new Wezel();
-        return ptr->nie;
-    }
-    else if (ptr->wyjscieTak == tekst)
-    {
-        ptr->tak = new Wezel();
-        return ptr->tak;
-    }
-    else
-    {
-        // etykiety nie zgadzaly sie, przejdź dalej po drzewie
-        Wezel * tmp = NULL;
-        if(ptr->nie != NULL)
-        {
-            tmp = dodajWezel(ptr->nie, tekst);
-            if(tmp != NULL)
-            {
-                return tmp;
-            }
-        }
-        if(ptr->tak != NULL)
-        {
-            tmp = dodajWezel(ptr->tak, tekst);
-            if(tmp != NULL)
-            {
-                return tmp;
-            }
-        }
-    }
-    // koniec drzewa
-    return NULL;
-}
-
-bool wczytajDrzewo(Wezel * & korzen, std::string nazwaPliku)
-{
-    std::ifstream plik(nazwaPliku.c_str(), std::ios::in);
-    std::string linia;
-    
-    korzen = new Wezel();
-    Wezel * ptr = korzen;
-    bool pierwszyWezel = true;
-    if(plik.good())
-    {
-        while(std::getline(plik, linia))
-        {
-            std::size_t pos = linia.find(' ');
-            std::string indeks = linia.substr(0, pos);
-
-            if (pierwszyWezel == true)
-            {
-                pierwszyWezel = false;
-            }
-            else
-            {
-                ptr = dodajWezel(korzen, indeks);
-                if (ptr == NULL)
-                {
-                    std::cout<<"Problem z plikiem drzewa: nie ma takiego indeksu wejscia"<<std::endl;
-                    return false;
-                }
-            }
-
-            linia = linia.substr(pos+1);
-            pos = linia.find(' ');
-            ptr->war.atrybut = linia.substr(0, pos);
-
-            linia = linia.substr(pos+1);
-            pos = linia.find(' ');
-            ptr->war.oper = linia.substr(0, pos);
-
-            linia = linia.substr(pos+1);
-            pos = linia.find(' ');
-            ptr->war.wartosc = atof(linia.substr(0, pos).c_str());
-
-            linia = linia.substr(pos+1);
-            pos = linia.find(' ');
-            ptr->wyjscieNie = linia.substr(0, pos);
-
-            linia = linia.substr(pos+1);
-            pos = linia.find(' ');
-            ptr->wyjscieTak = linia.substr(0, pos);
-        }
-    }
-    else
-    {
-        return false;
-    }
-    
-    // wyswietlDrzewo(korzen);
-    return true;
-}
-
 void dodajDoGrupy(std::vector<Grupa> &wynik, std::string dane, Wezel * korzen)
 {
    std::string etykieta = korzen->znajdzEtykiete(dane);
@@ -196,7 +82,7 @@ bool zapiszWynik(std::vector<Grupa> wynik, std::string nazwaPliku)
 }
 
 /** Funkcja sprawdzajaca parametry
- * 
+ * @return true albo false
  */
 bool wczytajParametry(const int argc, const char * argv[], std::string & wejsciowy, std::string & drzewa, std::string & wyjsciowy)
 {
@@ -258,10 +144,10 @@ int main(const int argc, const char * argv[])
         return 1;
     }
 
-
     // wczytanie drzewa z pliku do struktury drzewa
-    Wezel * korzen = NULL;
-    if (wczytajDrzewo(korzen, plikDrzewa) == false)
+    Wezel * korzen = new Wezel();
+
+    if (korzen->wczytajDrzewo(plikDrzewa) == false)
     {
         std::cout<<"Nie udalo sie wczytac drzewa z pliku: "<<plikDrzewa<<std::endl;
         return 1;

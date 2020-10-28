@@ -4,7 +4,6 @@
 
 class Wezel
 {
-public:
     std::string wejscie;
     Warunek war;
     std::string wyjscieNie;
@@ -13,7 +12,9 @@ public:
     Wezel * tak;
 public:
     std::string znajdzEtykiete(std::string dane);
-    
+    Wezel * dodaj(const std::string & tekst);
+    bool wczytajDrzewo(std::string nazwaPliku);
+
     ~Wezel()
     {
         delete nie;
