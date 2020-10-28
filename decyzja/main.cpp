@@ -3,29 +3,6 @@
 #include <fstream>
 #include <cstdlib>
 #include "Wezel.h"
-#include "Grupa.h"
-
-
-void dodajDoGrupy(std::vector<Grupa> &wynik, std::string dane, Wezel * korzen)
-{
-   std::string etykieta = korzen->znajdzEtykiete(dane);
-   bool juzIstnieje = false;
-   for(std::vector<Grupa>::iterator iter = wynik.begin(); iter != wynik.end(); iter++)
-   {
-       if (iter->etykieta == etykieta)
-       {
-           juzIstnieje = true;
-           iter->dane.push_back(dane);
-       }
-   }
-   if (juzIstnieje == false)
-   {
-       Grupa tmp;
-       tmp.etykieta = etykieta;
-       tmp.dane.push_back(dane);
-       wynik.push_back(tmp);
-   }
-}
 
 bool wczytajDane(std::vector<std::string> & dane, std::string nazwaPliku)
 {
@@ -164,7 +141,7 @@ int main(const int argc, const char * argv[])
     std::vector<Grupa> wynik;
     for(std::vector<std::string>::iterator iter = dane.begin(); iter != dane.end(); ++iter)
     {
-        dodajDoGrupy(wynik, *iter, korzen);
+        korzen->dodajDoGrupy(wynik, *iter);
     }
 
     // zapisanie wyniku ze struktury do pliku

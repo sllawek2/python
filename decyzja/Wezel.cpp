@@ -100,3 +100,24 @@ bool Wezel::wczytajDrzewo(std::string nazwaPliku)
     }
     return true;
 }
+
+void Wezel::dodajDoGrupy(std::vector<Grupa> &wynik, std::string dane)
+{
+   std::string etykieta = this->znajdzEtykiete(dane);
+   bool juzIstnieje = false;
+   for(std::vector<Grupa>::iterator iter = wynik.begin(); iter != wynik.end(); iter++)
+   {
+       if (iter->etykieta == etykieta)
+       {
+           juzIstnieje = true;
+           iter->dane.push_back(dane);
+       }
+   }
+   if (juzIstnieje == false)
+   {
+       Grupa tmp;
+       tmp.etykieta = etykieta;
+       tmp.dane.push_back(dane);
+       wynik.push_back(tmp);
+   }
+}
